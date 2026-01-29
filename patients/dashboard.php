@@ -1,15 +1,25 @@
 <?php
-echo "<h2>Dashboard</h2>";
-echo "<p>Welcome to the Barangay Health Center Information System (BHCIS)</p>";
-echo "<div>";
-echo "  <h3>Quick Links</h3>";
-echo "  <ul>";
-echo "    <li><a href='/bhcis/index.php?page=patients'>Patients</a></li>";
-echo "    <li><a href='/bhcis/index.php?page=consultations'>Consultations</a></li>";
-echo "    <li><a href='/bhcis/index.php?page=prenatal'>Prenatal Care</a></li>";
-echo "    <li><a href='/bhcis/index.php?page=postpartum'>Postpartum Care</a></li>";
-echo "    <li><a href='/bhcis/index.php?page=immunization'>Immunization</a></li>";
-echo "    <li><a href='/bhcis/index.php?page=users'>Users</a></li>";
-echo "  </ul>";
-echo "</div>";
+// Patient count
+$patients = $pdo->query("SELECT COUNT(*) FROM patient")->fetchColumn();
+
+// Today consultations
+$consults = $pdo->query("
+    SELECT COUNT(*) FROM consultation_record
+    WHERE date_of_consultation = CURDATE()
+")->fetchColumn();
+
+// Prenatal cases
+$prenatal = $pdo->query("SELECT COUNT(*) FROM prenatal_record")->fetchColumn();
+
+// Immunizations
+$immunization = $pdo->query("SELECT COUNT(*) FROM immunization")->fetchColumn();
 ?>
+
+<h2>Dashboard</h2>
+
+<ul>
+    <li>Total Patients: <strong><?= $patients ?></strong></li>
+    <li>Consultations Today: <strong><?= $consults ?></strong></li>
+    <li>Prenatal Records: <strong><?= $prenatal ?></strong></li>
+    <li>Immunizations Given: <strong><?= $immunization ?></strong></li>
+</ul>

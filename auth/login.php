@@ -2,29 +2,33 @@
 session_start();
 require_once __DIR__ . '/../config/db.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+$error = null;
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->execute([$username]);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $stmt = $pdo->prepare("
+        SELECT u.user_id, u.password, r.role_name
+        FROM users u
+        JOIN user_roles r ON u.role_id = r.role_id
+        WHERE u.username = ?
+    ");
+    $stmt->execute([$_POST['username']]);
     $user = $stmt->fetch();
 
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['role_id'] = $user['role_id'];
+    if ($user && password_verify($_POST['password'], $user['password'])) {
+        $_SESSION['user_id']  = $user['user_id'];
+        $_SESSION['role']     = $user['role_name'];
         header("Location: /bhcis/index.php");
         exit;
-    } else {
-        $error = "Invalid credentials";
     }
+
+    $error = "Invalid credentials";
 }
 ?>
 
 <form method="POST">
-    <h2>Login</h2>
-    <?php if (!empty($error)) echo "<p style='color:red'>$error</p>"; ?>
-    <input type="text" name="username" placeholder="Username" required><br><br>
-    <input type="password" name="password" placeholder="Password" required><br><br>
+    <h2>BHCIS Login</h2>
+    <?= $error ? "<p style='color:red'>$error</p>" : "" ?>
+    <input name="username" required placeholder="Username"><br><br>
+    <input type="password" name="password" required placeholder="Password"><br><br>
     <button type="submit">Login</button>
 </form>

@@ -1,20 +1,20 @@
 <?php
-// Start session
+declare(strict_types=1);
 session_start();
 
-// Base path definition
 define('BASE_PATH', __DIR__);
 
-// Core includes
+// Core
 require_once BASE_PATH . '/config/db.php';
 require_once BASE_PATH . '/includes/auth_check.php';
 require_once BASE_PATH . '/includes/header.php';
 
-// Simple router using ?page=
+// Default landing
 $page = $_GET['page'] ?? 'dashboard';
 
+// Route map (matches your folder structure)
 $routes = [
-    'dashboard'     => 'patients/dashboard.php',
+    'dashboard'     => 'dashboard.php',
     'patients'      => 'patients/index.php',
     'consultations' => 'consultations/index.php',
     'prenatal'      => 'prenatal/index.php',
@@ -23,16 +23,17 @@ $routes = [
     'users'         => 'users/index.php',
 ];
 
-if (array_key_exists($page, $routes)) {
-    $file = BASE_PATH . '/' . $routes[$page];
-    if (file_exists($file)) {
-        require $file;
-    } else {
-        echo "<h3>Module file not found.</h3>";
-    }
+// Resolve route
+if ($page === 'dashboard') {
+    require BASE_PATH . '/dashboard.php';
+} elseif (isset($routes[$page])) {
+    $path = BASE_PATH . '/' . $routes[$page];
+    file_exists($path)
+        ? require $path
+        : print "<h3>Module not found</h3>";
 } else {
-    echo "<h3>404 - Page not found</h3>";
+    http_response_code(404);
+    echo "<h3>404 – Page not found</h3>";
 }
 
-// Footer
 require_once BASE_PATH . '/includes/footer.php';
