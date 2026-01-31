@@ -1,4 +1,29 @@
-<h2 style="margin-bottom:15px; color:#333;">Patients</h2>
+<?php
+session_start();
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/auth_check.php';
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patients</title>
+</head>
+<body style="font-family: Arial, sans-serif; background:#f4f6f8; margin:0; padding:20px;">
+
+<div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+  <a href="../"
+     style="
+       padding:8px 14px;
+       background:#666;
+       color:#fff;
+       text-decoration:none;
+       border-radius:4px;
+     ">
+     ← Back
+  </a>
+  <h2 style="margin:0;">Patients</h2>
+</div>
 
 <a href="patients/create.php" style="
     display:inline-block;
@@ -31,10 +56,11 @@
 
 <?php
 // Fetch patients with their zone numbers
-$stmt = $conn->query("
+$stmt = $pdo->query("
     SELECT p.patient_id, p.first_name, p.last_name, p.middle_name, p.suffix, z.zone_number
     FROM patient p
-    LEFT JOIN zone z ON p.household_id = z.zone_id
+    LEFT JOIN household h ON p.household_id = h.household_id
+    LEFT JOIN zone z ON h.zone_id = z.zone_id
     ORDER BY p.last_name ASC
 ");
 $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -48,10 +74,10 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
             (!empty($row['suffix']) ? ', ' . $row['suffix'] : '')) ?>
     </td>
     <td style="padding:10px; border:1px solid #ddd; text-align:center;">
-        <?= $row['zone_number'] ?? '—' ?>
+        <?= htmlspecialchars($row['zone_number'] ?? '—') ?>
     </td>
     <td style="padding:10px; border:1px solid #ddd; text-align:center;">
-        <a href="view.php?id=<?= $row['patient_id'] ?>" style="
+        <a href="patients/view.php?id=<?= $row['patient_id'] ?>" style="
             padding:6px 10px;
             background:#43a047;
             color:white;
@@ -73,3 +99,5 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </tr>
 <?php endif; ?>
 </table>
+</body>
+</html>
