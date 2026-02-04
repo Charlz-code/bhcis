@@ -2,14 +2,12 @@
 session_start();
 require_once __DIR__ . '/../config/db.php';
 
-/*
- Fetch recent consultations
-*/
 $stmt = $pdo->query("
     SELECT 
         c.record_id,
         c.date_of_consultation,
         c.consultation_time,
+        c.name_of_attending_provider,
         p.last_name,
         p.first_name,
         nv.visit_type
@@ -20,87 +18,52 @@ $stmt = $pdo->query("
 ");
 $consultations = $stmt->fetchAll();
 ?>
-
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Consultations</title>
-</head>
-<body style="font-family: Arial, sans-serif; background:#f4f6f8; margin:0; padding:20px;">
+<head><title>Consultations</title></head>
+<body style="font-family:Arial;background:#f4f6f8;padding:20px;">
 
-<h2 style="margin-bottom:10px;">Consultation Records</h2>
+<h2>Consultation Records</h2>
 
-<a href="/create.php"
-   style="
-     display:inline-block;
-     padding:8px 14px;
-     background:#1e88e5;
-     color:#fff;
-     text-decoration:none;
-     border-radius:4px;
-     margin-bottom:15px;
-   ">
+<a href="/bhcis/consultations/create.php"
+   style="padding:8px 14px;background:#1e88e5;color:#fff;text-decoration:none;border-radius:4px;">
    + New Consultation
 </a>
 
-<table style="
-    width:100%;
-    border-collapse:collapse;
-    background:#fff;
-    box-shadow:0 2px 6px rgba(0,0,0,0.1);
-">
-    <thead style="background:#e3f2fd;">
-        <tr>
-            <th style="padding:10px; border:1px solid #ccc;">Date</th>
-            <th style="padding:10px; border:1px solid #ccc;">Time</th>
-            <th style="padding:10px; border:1px solid #ccc;">Patient</th>
-            <th style="padding:10px; border:1px solid #ccc;">Visit Type</th>
-            <th style="padding:10px; border:1px solid #ccc;">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-    <?php if (count($consultations) === 0): ?>
-        <tr>
-            <td colspan="5" style="padding:15px; text-align:center;">
-                No consultation records found.
-            </td>
-        </tr>
-    <?php else: ?>
-        <?php foreach ($consultations as $c): ?>
-        <tr style="text-align:center;">
-            <td style="padding:8px; border:1px solid #ddd;">
-                <?= htmlspecialchars($c['date_of_consultation']) ?>
-            </td>
-            <td style="padding:8px; border:1px solid #ddd;">
-                <?= htmlspecialchars($c['consultation_time']) ?>
-            </td>
-            <td style="padding:8px; border:1px solid #ddd; text-align:left;">
-                <?= htmlspecialchars($c['last_name'] . ', ' . $c['first_name']) ?>
-            </td>
-            <td style="padding:8px; border:1px solid #ddd;">
-                <?= htmlspecialchars($c['visit_type'] ?? '—') ?>
-            </td>
-            <td style="padding:8px; border:1px solid #ddd;">
-                <a href="view.php?id=<?= $c['record_id'] ?>"
-                   style="
-                     padding:4px 8px;
-                     background:#43a047;
-                     color:white;
-                     text-decoration:none;
-                     border-radius:3px;
-                   ">
-                   View
-                </a>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-    <?php endif; ?>
-    </tbody>
+<table style="width:100%;margin-top:15px;border-collapse:collapse;background:#fff;">
+<thead style="background:#e3f2fd;">
+<tr>
+    <th>Date</th>
+    <th>Time</th>
+    <th>Patient</th>
+    <th>Visit Type</th>
+    <th>Provider</th>
+    <th>Action</th>
+</tr>
+</thead>
+<tbody>
+<?php if (!$consultations): ?>
+<tr><td colspan="6" style="text-align:center;padding:15px;">No records found</td></tr>
+<?php else: foreach ($consultations as $c): ?>
+<tr style="text-align:center;">
+<td><?= htmlspecialchars($c['date_of_consultation']) ?></td>
+<td><?= $c['consultation_time'] ?? '—' ?></td>
+<td style="text-align:left">
+    <?= htmlspecialchars($c['last_name'] . ', ' . $c['first_name']) ?>
+</td>
+<td><?= htmlspecialchars($c['visit_type'] ?? '—') ?></td>
+<td><?= htmlspecialchars($c['name_of_attending_provider']) ?></td>
+<td>
+<a href="view.php?id=<?= $c['record_id'] ?>"
+   style="padding:4px 8px;background:#43a047;color:#fff;border-radius:3px;text-decoration:none;">
+   View
+</a>
+</td>
+</tr>
+<?php endforeach; endif; ?>
+</tbody>
 </table>
 
-<p style="margin-top:10px; color:#555;">
-    Total Records: <strong><?= count($consultations) ?></strong>
-</p>
-
+<p>Total Records: <strong><?= count($consultations) ?></strong></p>
 </body>
 </html>

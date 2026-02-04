@@ -33,7 +33,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
     <div style="font-size:14px;">
         Logged in as:
-        <strong><?= $_SESSION['username'] ?? 'User' ?></strong>
+        <strong><?= $_SESSION['username'] ?? 'Admin' ?></strong>
     </div>
 </div>
 

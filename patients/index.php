@@ -25,7 +25,7 @@ require_once __DIR__ . '/../includes/auth_check.php';
   <h2 style="margin:0;">Patients</h2>
 </div>
 
-<a href="patients/create.php" style="
+<a href="create.php/" style="
     display:inline-block;
     margin-bottom:15px;
     padding:10px 16px;
@@ -77,7 +77,7 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?= htmlspecialchars($row['zone_number'] ?? '—') ?>
     </td>
     <td style="padding:10px; border:1px solid #ddd; text-align:center;">
-        <a href="patients/view.php?id=<?= $row['patient_id'] ?>" style="
+        <a href="view.php?id=<?= $row['patient_id'] ?>" style="
             padding:6px 10px;
             background:#43a047;
             color:white;
